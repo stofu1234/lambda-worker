@@ -7,8 +7,13 @@ export default class LambdaWorker {
       self.addEventListener('message', function(e) {
 
         const lambdaScript = ${lambdaScript.toString()};
-
-        const ret = lambdaScript(...(e.data));
+        
+        let ret = null;
+        try {
+          ret = lambdaScript(...(e.data));
+        } catch(e) {
+          ret = e;
+        }
 
         //処理結果を送信
         self.postMessage(ret);
@@ -24,7 +29,11 @@ export default class LambdaWorker {
     const parent = this;
     this.worker.addEventListener('message', function(e) {
       parent.returnPromise = new Promise((resolve, reject) => {
-        resolve(e.data);
+        if(e.data instanceof Error) {
+          reject(e.data);
+        } else {
+          resolve(e.data);
+        }
       });
     });
   }
@@ -33,3 +42,4 @@ export default class LambdaWorker {
     this.worker.postMessage(postData);
   }
 }
+
