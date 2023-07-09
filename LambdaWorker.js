@@ -1,7 +1,4 @@
 export default class LambdaWorker {
-  worker = null;
-  returnPromise = null;
-
   constructor(lambdaScript) {
     const workerScript = `
       self.addEventListener('message', function(e) {
